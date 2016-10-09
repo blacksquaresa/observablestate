@@ -1,30 +1,34 @@
 var ObservableState;
 (function (ObservableState) {
-    var StateDescription = (function () {
-        function StateDescription(parent) {
+    var Description = (function () {
+        function Description(parent) {
             var properties = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 properties[_i - 1] = arguments[_i];
             }
             this._currentProperties = new Array();
             this._state = DescriptionState.Preparing;
+            this._relevantProperties = new Array();
             this._parent = parent;
             this._operators = new ObservableState.Operators();
             this._cases = new Array();
             this.And.apply(this, properties);
         }
-        StateDescription.prototype.AddDetail = function (operator) {
+        Description.prototype.AddDetail = function (operator) {
             var parameters = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 parameters[_i - 1] = arguments[_i];
             }
             if (this._currentProperties !== null && this._currentProperties.length > 0) {
-                var property = this._currentProperties.pop();
+                var property = this._currentProperties.shift();
                 var detail = new (ObservableState.Detail.bind.apply(ObservableState.Detail, [void 0].concat([property, operator], parameters)))();
                 this._currentCase.push(detail);
+                if (this._relevantProperties.indexOf(property) === -1) {
+                    this._relevantProperties.push(property);
+                }
             }
         };
-        StateDescription.prototype.And = function () {
+        Description.prototype.And = function () {
             var properties = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 properties[_i - 0] = arguments[_i];
@@ -34,12 +38,14 @@ var ObservableState;
             this._cases.push(this._currentCase);
             return this;
         };
-        StateDescription.prototype.Then = function (action) {
+        Description.prototype.Then = function (action, behaviour) {
+            if (behaviour === void 0) { behaviour = MatchBehaviour.FireOnEnter; }
             this._action = action;
-            this._state = DescriptionState.Ready;
+            this._state = this.CheckState(null, true) ? DescriptionState.Matched : DescriptionState.Ready;
+            this._behaviour = behaviour;
             return this;
         };
-        StateDescription.prototype.Equals = function () {
+        Description.prototype.Equals = function () {
             var values = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 values[_i - 0] = arguments[_i];
@@ -50,7 +56,7 @@ var ObservableState;
             }
             return this;
         };
-        StateDescription.prototype.IsGreaterThan = function () {
+        Description.prototype.IsGreaterThan = function () {
             var values = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 values[_i - 0] = arguments[_i];
@@ -61,7 +67,7 @@ var ObservableState;
             }
             return this;
         };
-        StateDescription.prototype.IsLessThan = function () {
+        Description.prototype.IsLessThan = function () {
             var values = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 values[_i - 0] = arguments[_i];
@@ -72,7 +78,7 @@ var ObservableState;
             }
             return this;
         };
-        StateDescription.prototype.StartsWith = function () {
+        Description.prototype.StartsWith = function () {
             var values = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 values[_i - 0] = arguments[_i];
@@ -83,7 +89,7 @@ var ObservableState;
             }
             return this;
         };
-        StateDescription.prototype.EndsWith = function () {
+        Description.prototype.EndsWith = function () {
             var values = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 values[_i - 0] = arguments[_i];
@@ -94,7 +100,7 @@ var ObservableState;
             }
             return this;
         };
-        StateDescription.prototype.Matches = function () {
+        Description.prototype.Matches = function () {
             var values = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 values[_i - 0] = arguments[_i];
@@ -105,7 +111,17 @@ var ObservableState;
             }
             return this;
         };
-        StateDescription.prototype.CheckState = function () {
+        Description.prototype.CheckState = function (propertyName, triggerAction) {
+            if (triggerAction === void 0) { triggerAction = true; }
+            // If we're not prepared and ready yet, or if we're already matched and the behaviour says we only fire when the state enters this described state, then stop processing.
+            if (this._state === DescriptionState.Preparing ||
+                (this._state === DescriptionState.Matched && this._behaviour === MatchBehaviour.FireOnEnter)) {
+                return false;
+            }
+            // If the property that just changed is not relevant to this description, don't bother to check it.
+            if (this._relevantProperties.indexOf(propertyName) === -1) {
+                return false;
+            }
             var trigger = true;
             for (var _i = 0, _a = this._cases; _i < _a.length; _i++) {
                 var option = _a[_i];
@@ -116,17 +132,26 @@ var ObservableState;
             }
             if (trigger) {
                 this._action();
+                this._state = DescriptionState.Matched;
+            }
+            else {
+                this._state = DescriptionState.Ready;
             }
             return trigger;
         };
-        return StateDescription;
+        return Description;
     }());
-    ObservableState.StateDescription = StateDescription;
+    ObservableState.Description = Description;
     var DescriptionState;
     (function (DescriptionState) {
         DescriptionState[DescriptionState["Preparing"] = 0] = "Preparing";
         DescriptionState[DescriptionState["Ready"] = 1] = "Ready";
-        DescriptionState[DescriptionState["Paused"] = 2] = "Paused";
+        DescriptionState[DescriptionState["Matched"] = 2] = "Matched";
     })(DescriptionState || (DescriptionState = {}));
+    (function (MatchBehaviour) {
+        MatchBehaviour[MatchBehaviour["FireOnEveryMatch"] = 0] = "FireOnEveryMatch";
+        MatchBehaviour[MatchBehaviour["FireOnEnter"] = 1] = "FireOnEnter";
+    })(ObservableState.MatchBehaviour || (ObservableState.MatchBehaviour = {}));
+    var MatchBehaviour = ObservableState.MatchBehaviour;
 })(ObservableState || (ObservableState = {}));
-//# sourceMappingURL=StateDescription.js.map
+//# sourceMappingURL=Description.js.map

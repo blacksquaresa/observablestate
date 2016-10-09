@@ -2,7 +2,7 @@
   export class StateObject {
     private _sourceObject: any;
     private _properties: { [key: string]: Property } = {};
-    private _descriptions: StateDescription[] = new Array<StateDescription>();
+    private _descriptions: Description[] = new Array<Description>();
 
     constructor(sourceObject: any) {
       this._sourceObject = sourceObject;
@@ -18,9 +18,9 @@
       }
     }
 
-    private TriggerChanges(): void {
+    private TriggerChanges(propertyName: string): void {
       for(let description of this._descriptions) {
-        description.CheckState();
+        description.CheckState(propertyName);
       }
     }
 
@@ -39,7 +39,7 @@
 
       this._properties[name] = new Property(name, value);
 
-      this.TriggerChanges();
+      this.TriggerChanges(name);
     }
 
     SetPropertyValue(name: string, value: any): void {
@@ -49,11 +49,11 @@
 
       this._properties[name].Value = value;
 
-      this.TriggerChanges();
+      this.TriggerChanges(name);
     }
 
-    When(...properties: string[]): StateDescription {
-      const desc = new StateDescription(this, ...properties);
+    When(...properties: string[]): Description {
+      const desc = new Description(this, ...properties);
       this._descriptions.push(desc);
       return desc;
     }

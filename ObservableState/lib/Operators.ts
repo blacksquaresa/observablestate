@@ -14,18 +14,19 @@
     }
 
     StartsWith(state: StateObject, property: string, value: string): boolean {
-      const prop = state.GetPropertyValue(property);
-      return prop.subString(0, value.length) === value;
+      const prop = state.GetPropertyValue(property) as string;
+      return prop.substring(0, value.length) === value;
     }
 
     EndsWith(state: StateObject, property: string, value: string): boolean {
-      const prop = state.GetPropertyValue(property);
-      return prop.subString(prop.length - value.length) === value;
+      const prop = state.GetPropertyValue(property) as string;
+      return prop.substring(prop.length - value.length) === value;
     }
 
     Matches(state: StateObject, property: string, value: string): boolean {
       const regex = new RegExp(value);
-      return state.GetPropertyValue(property).match(regex);
+      const prop = state.GetPropertyValue(property) as string;
+      return regex.test(prop);
     }
   }
 }

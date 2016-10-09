@@ -15,10 +15,10 @@ var ObservableState;
                 }
             }
         };
-        StateObject.prototype.TriggerChanges = function () {
+        StateObject.prototype.TriggerChanges = function (propertyName) {
             for (var _i = 0, _a = this._descriptions; _i < _a.length; _i++) {
                 var description = _a[_i];
-                description.CheckState();
+                description.CheckState(propertyName);
             }
         };
         StateObject.prototype.GetProperty = function (name) {
@@ -32,21 +32,21 @@ var ObservableState;
                 return this.SetPropertyValue(name, value);
             }
             this._properties[name] = new ObservableState.Property(name, value);
-            this.TriggerChanges();
+            this.TriggerChanges(name);
         };
         StateObject.prototype.SetPropertyValue = function (name, value) {
             if (!this._properties.hasOwnProperty(name)) {
                 return this.SetProperty(name, value);
             }
             this._properties[name].Value = value;
-            this.TriggerChanges();
+            this.TriggerChanges(name);
         };
         StateObject.prototype.When = function () {
             var properties = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 properties[_i - 0] = arguments[_i];
             }
-            var desc = new (ObservableState.StateDescription.bind.apply(ObservableState.StateDescription, [void 0].concat([this], properties)))();
+            var desc = new (ObservableState.Description.bind.apply(ObservableState.Description, [void 0].concat([this], properties)))();
             this._descriptions.push(desc);
             return desc;
         };

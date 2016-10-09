@@ -14,15 +14,16 @@ var ObservableState;
         };
         Operators.prototype.StartsWith = function (state, property, value) {
             var prop = state.GetPropertyValue(property);
-            return prop.subString(0, value.length) === value;
+            return prop.substring(0, value.length) === value;
         };
         Operators.prototype.EndsWith = function (state, property, value) {
             var prop = state.GetPropertyValue(property);
-            return prop.subString(prop.length - value.length) === value;
+            return prop.substring(prop.length - value.length) === value;
         };
         Operators.prototype.Matches = function (state, property, value) {
             var regex = new RegExp(value);
-            return state.GetPropertyValue(property).match(regex);
+            var prop = state.GetPropertyValue(property);
+            return regex.test(prop);
         };
         return Operators;
     }());

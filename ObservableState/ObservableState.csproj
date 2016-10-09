@@ -30,7 +30,7 @@
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="lib\Case.ts" />
     <TypeScriptCompile Include="lib\Detail.ts" />
-    <TypeScriptCompile Include="lib\StateDescription.ts" />
+    <TypeScriptCompile Include="lib\Description.ts" />
     <TypeScriptCompile Include="lib\StateObject.ts" />
     <TypeScriptCompile Include="lib\Property.ts" />
     <TypeScriptCompile Include="lib\Operators.ts" />
