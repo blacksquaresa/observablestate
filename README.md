@@ -5,7 +5,7 @@ A small library for managing a state machine as an observable
 First, create your state object:
 
 ```
-var state = new ObservableStae.StateObject({ name: 'bob', age: 40, gender: 'male' });
+var state = new ObservableState.StateObject({ name: 'bob', age: 40, gender: 'male' });
 ```
 
 Then register to listen for state changes:
