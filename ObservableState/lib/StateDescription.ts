@@ -6,18 +6,20 @@
     private _state: DescriptionState = DescriptionState.Preparing;
     private _action: Function;
     private _cases: Case[];
+    private _currentCase: Case;
 
-    constructor( parent: StateObject<T>, ...properties: string[] ) {
+    constructor(parent: StateObject<T>, ...properties: string[]) {
       this._parent = parent;
-      this._operators = new Operators<T>( this._parent );
+      this._operators = new Operators<T>(this._parent);
+      this._cases = new Array<Case>();
 
-      if ( properties !== null ) {
-        this._currentProperties = properties;
-      }
+      this.And(...properties);
     }
 
     And(...properties: string[]): StateDescription<T> {
       this._currentProperties = properties;
+      this._currentCase = new Case();
+      this._cases.push(this._currentCase);
       return this;
     }
 
@@ -30,12 +32,12 @@
       if (this._currentProperties !== null && this._currentProperties.length > 0) {
         const property = this._currentProperties.pop();
         const detail = new Detail(property, operator, ...parameters);
+        this._currentCase.push(detail);
       }
     }
 
     Equals(...values: any[]): StateDescription<T> {
-      for(let value of values)
-      {
+      for (let value of values) {
         this.AddDetail(this._operators.Equals, value);
       }
       return this;

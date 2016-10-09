@@ -10,9 +10,8 @@ var ObservableState;
             this._state = DescriptionState.Preparing;
             this._parent = parent;
             this._operators = new ObservableState.Operators(this._parent);
-            if (properties !== null) {
-                this._currentProperties = properties;
-            }
+            this._cases = new Array();
+            this.And.apply(this, properties);
         }
         StateDescription.prototype.And = function () {
             var properties = [];
@@ -20,6 +19,8 @@ var ObservableState;
                 properties[_i - 0] = arguments[_i];
             }
             this._currentProperties = properties;
+            this._currentCase = new ObservableState.Case();
+            this._cases.push(this._currentCase);
             return this;
         };
         StateDescription.prototype.Then = function (action) {
@@ -34,6 +35,7 @@ var ObservableState;
             if (this._currentProperties !== null && this._currentProperties.length > 0) {
                 var property = this._currentProperties.pop();
                 var detail = new (ObservableState.Detail.bind.apply(ObservableState.Detail, [void 0].concat([property, operator], parameters)))();
+                this._currentCase.push(detail);
             }
         };
         StateDescription.prototype.Equals = function () {

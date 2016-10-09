@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="lib\OptionSet.ts" />
     <TypeScriptCompile Include="lib\Case.ts" />
     <TypeScriptCompile Include="lib\Detail.ts" />
     <TypeScriptCompile Include="lib\StateDescription.ts" />
