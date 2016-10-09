@@ -12,4 +12,4 @@ Then register to listen for state changes:
 
 ```
 state.When('name').Equals('billy').Then(function(){ console.log('name is now billy'); });
-'''
+```
