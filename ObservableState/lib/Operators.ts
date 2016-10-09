@@ -1,33 +1,31 @@
 ﻿namespace ObservableState {
-  export class Operators<T> {
-    private StateObject: StateObject<T>;
+  export class Operators {
 
-    constructor(state: StateObject<T>) {
-      this.StateObject = state;
+    Equals(state: StateObject, property: string, value: any): boolean {
+      return state.GetPropertyValue(property) === value;
     }
 
-    Equals(property: string, value: any): boolean {
-      return this.StateObject.GetPropertyValue(property) === value;
+    IsGreaterThan(state: StateObject, property: string, value: number): boolean {
+      return state.GetPropertyValue(property) > value;
     }
 
-    IsGreaterThan(property: string, value: number): boolean {
-      return this.StateObject.GetPropertyValue(property) === value;
+    IsLessThan(state: StateObject, property: string, value: number): boolean {
+      return state.GetPropertyValue(property) < value;
     }
 
-    IsLessThan(property: string, value: number): boolean {
-      return this.StateObject.GetPropertyValue(property) === value;
+    StartsWith(state: StateObject, property: string, value: string): boolean {
+      const prop = state.GetPropertyValue(property);
+      return prop.subString(0, value.length) === value;
     }
 
-    StartsWith(property: string, value: string): boolean {
-      return this.StateObject.GetPropertyValue(property) === value;
+    EndsWith(state: StateObject, property: string, value: string): boolean {
+      const prop = state.GetPropertyValue(property);
+      return prop.subString(prop.length - value.length) === value;
     }
 
-    EndsWith(property: string, value: string): boolean {
-      return this.StateObject.GetPropertyValue(property) === value;
-    }
-
-    Matches(property: string, value: string): boolean {
-      return this.StateObject.GetPropertyValue(property) === value;
+    Matches(state: StateObject, property: string, value: string): boolean {
+      const regex = new RegExp(value);
+      return state.GetPropertyValue(property).match(regex);
     }
   }
 }

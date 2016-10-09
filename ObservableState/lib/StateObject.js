@@ -15,6 +15,12 @@ var ObservableState;
                 }
             }
         };
+        StateObject.prototype.TriggerChanges = function () {
+            for (var _i = 0, _a = this._descriptions; _i < _a.length; _i++) {
+                var description = _a[_i];
+                description.CheckState();
+            }
+        };
         StateObject.prototype.GetProperty = function (name) {
             return this._properties[name];
         };
@@ -26,12 +32,14 @@ var ObservableState;
                 return this.SetPropertyValue(name, value);
             }
             this._properties[name] = new ObservableState.Property(name, value);
+            this.TriggerChanges();
         };
         StateObject.prototype.SetPropertyValue = function (name, value) {
             if (!this._properties.hasOwnProperty(name)) {
                 return this.SetProperty(name, value);
             }
             this._properties[name].Value = value;
+            this.TriggerChanges();
         };
         StateObject.prototype.When = function () {
             var properties = [];

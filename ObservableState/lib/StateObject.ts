@@ -1,10 +1,10 @@
 ﻿namespace ObservableState {
-  export class StateObject<T> {
-    private _sourceObject: T;
+  export class StateObject {
+    private _sourceObject: any;
     private _properties: { [key: string]: Property } = {};
-    private _descriptions: StateDescription<T>[] = new Array<StateDescription<T>>();
+    private _descriptions: StateDescription[] = new Array<StateDescription>();
 
-    constructor(sourceObject: T) {
+    constructor(sourceObject: any) {
       this._sourceObject = sourceObject;
       this.prepareMe();
     }
@@ -15,6 +15,12 @@
           const property = new Property(prop, this._sourceObject[prop]);
           this._properties[prop] = property;
         }
+      }
+    }
+
+    private TriggerChanges(): void {
+      for(let description of this._descriptions) {
+        description.CheckState();
       }
     }
 
@@ -32,6 +38,8 @@
       }
 
       this._properties[name] = new Property(name, value);
+
+      this.TriggerChanges();
     }
 
     SetPropertyValue(name: string, value: any): void {
@@ -40,10 +48,12 @@
       }
 
       this._properties[name].Value = value;
+
+      this.TriggerChanges();
     }
 
-    When(...properties: string[]): StateDescription<T> {
-      const desc = new StateDescription<T>(this, ...properties);
+    When(...properties: string[]): StateDescription {
+      const desc = new StateDescription(this, ...properties);
       this._descriptions.push(desc);
       return desc;
     }

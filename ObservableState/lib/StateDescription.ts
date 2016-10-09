@@ -1,31 +1,19 @@
 ﻿namespace ObservableState {
-  export class StateDescription<T> {
-    private _parent: StateObject<T>;
-    private _operators: Operators<T>;
+  export class StateDescription {
+    private _parent: StateObject;
+    private _operators: Operators;
     private _currentProperties: string[] = new Array<string>();
     private _state: DescriptionState = DescriptionState.Preparing;
     private _action: Function;
     private _cases: Case[];
     private _currentCase: Case;
 
-    constructor(parent: StateObject<T>, ...properties: string[]) {
+    constructor(parent: StateObject, ...properties: string[]) {
       this._parent = parent;
-      this._operators = new Operators<T>(this._parent);
+      this._operators = new Operators();
       this._cases = new Array<Case>();
 
       this.And(...properties);
-    }
-
-    And(...properties: string[]): StateDescription<T> {
-      this._currentProperties = properties;
-      this._currentCase = new Case();
-      this._cases.push(this._currentCase);
-      return this;
-    }
-
-    Then(action: Function): StateDescription<T> {
-      this._action = action;
-      return this;
     }
 
     private AddDetail(operator: Function, ...parameters: any[]) {
@@ -36,46 +24,77 @@
       }
     }
 
-    Equals(...values: any[]): StateDescription<T> {
+    And(...properties: string[]): StateDescription {
+      this._currentProperties = properties;
+      this._currentCase = new Case();
+      this._cases.push(this._currentCase);
+      return this;
+    }
+
+    Then(action: Function): StateDescription {
+      this._action = action;
+      this._state = DescriptionState.Ready;
+      return this;
+    }
+
+    Equals(...values: any[]): StateDescription {
       for (let value of values) {
         this.AddDetail(this._operators.Equals, value);
       }
       return this;
     }
 
-    IsGreaterThan(...values: number[]): StateDescription<T> {
+    IsGreaterThan(...values: number[]): StateDescription {
       for (let value of values) {
         this.AddDetail(this._operators.IsGreaterThan, value);
       }
       return this;
     }
 
-    IsLessThan(...values: number[]): StateDescription<T> {
+    IsLessThan(...values: number[]): StateDescription {
       for (let value of values) {
         this.AddDetail(this._operators.IsLessThan, value);
       }
       return this;
     }
 
-    StartsWith(...values: string[]): StateDescription<T> {
+    StartsWith(...values: string[]): StateDescription {
       for (let value of values) {
         this.AddDetail(this._operators.StartsWith, value);
       }
       return this;
     }
 
-    EndsWith(...values: string[]): StateDescription<T> {
+    EndsWith(...values: string[]): StateDescription {
       for (let value of values) {
         this.AddDetail(this._operators.EndsWith, value);
       }
       return this;
     }
 
-    Matches(...values: string[]): StateDescription<T> {
+    Matches(...values: string[]): StateDescription {
       for (let value of values) {
         this.AddDetail(this._operators.Matches, value);
       }
       return this;
+    }
+
+    CheckState(): boolean {
+      let trigger = true;
+
+      for(let option of this._cases)
+      {
+        if(!option.CheckState(this._parent)) {
+          trigger = false;
+          break;
+        }
+      }
+
+      if(trigger) {
+        this._action();
+      }
+
+      return trigger;
     }
   }
 

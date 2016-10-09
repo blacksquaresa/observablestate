@@ -7,7 +7,10 @@ var Greeter = (function () {
         this.span.innerText = new Date().toUTCString();
         this.state = new ObservableState.StateObject({ name: 'gareth', age: 42 });
         this.state.When("name").Equals("Sam").Then(function () { alert('Name changed to Sam'); });
+        this.state.When("age").IsGreaterThan(42).Then(function () { alert('Age increased'); });
+        this.state.When("age").IsGreaterThan(42).And("name").Equals("Sam").Then(function () { alert('Name and Age changed'); });
         this.state.SetProperty("name", "Sam");
+        this.state.SetProperty("age", 43);
     }
     Greeter.prototype.start = function () {
         var _this = this;

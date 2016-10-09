@@ -10,6 +10,9 @@ var ObservableState;
             this.Operator = operator;
             this.Parameters = parameters;
         }
+        Detail.prototype.CheckDetail = function (state) {
+            return this.Operator.apply(this, [state, this.Property].concat(this.Parameters));
+        };
         return Detail;
     }());
     ObservableState.Detail = Detail;

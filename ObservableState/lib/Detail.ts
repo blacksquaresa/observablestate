@@ -9,5 +9,9 @@
       this.Operator = operator;
       this.Parameters = parameters;
     }
+
+    CheckDetail(state: StateObject): boolean {
+      return this.Operator(state, this.Property, ...this.Parameters);
+    }
   }
 }

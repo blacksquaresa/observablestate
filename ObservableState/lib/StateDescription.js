@@ -9,10 +9,21 @@ var ObservableState;
             this._currentProperties = new Array();
             this._state = DescriptionState.Preparing;
             this._parent = parent;
-            this._operators = new ObservableState.Operators(this._parent);
+            this._operators = new ObservableState.Operators();
             this._cases = new Array();
             this.And.apply(this, properties);
         }
+        StateDescription.prototype.AddDetail = function (operator) {
+            var parameters = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                parameters[_i - 1] = arguments[_i];
+            }
+            if (this._currentProperties !== null && this._currentProperties.length > 0) {
+                var property = this._currentProperties.pop();
+                var detail = new (ObservableState.Detail.bind.apply(ObservableState.Detail, [void 0].concat([property, operator], parameters)))();
+                this._currentCase.push(detail);
+            }
+        };
         StateDescription.prototype.And = function () {
             var properties = [];
             for (var _i = 0; _i < arguments.length; _i++) {
@@ -25,18 +36,8 @@ var ObservableState;
         };
         StateDescription.prototype.Then = function (action) {
             this._action = action;
+            this._state = DescriptionState.Ready;
             return this;
-        };
-        StateDescription.prototype.AddDetail = function (operator) {
-            var parameters = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                parameters[_i - 1] = arguments[_i];
-            }
-            if (this._currentProperties !== null && this._currentProperties.length > 0) {
-                var property = this._currentProperties.pop();
-                var detail = new (ObservableState.Detail.bind.apply(ObservableState.Detail, [void 0].concat([property, operator], parameters)))();
-                this._currentCase.push(detail);
-            }
         };
         StateDescription.prototype.Equals = function () {
             var values = [];
@@ -103,6 +104,20 @@ var ObservableState;
                 this.AddDetail(this._operators.Matches, value);
             }
             return this;
+        };
+        StateDescription.prototype.CheckState = function () {
+            var trigger = true;
+            for (var _i = 0, _a = this._cases; _i < _a.length; _i++) {
+                var option = _a[_i];
+                if (!option.CheckState(this._parent)) {
+                    trigger = false;
+                    break;
+                }
+            }
+            if (trigger) {
+                this._action();
+            }
+            return trigger;
         };
         return StateDescription;
     }());

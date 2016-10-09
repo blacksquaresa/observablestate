@@ -10,6 +10,17 @@ var ObservableState;
         function Case() {
             _super.apply(this, arguments);
         }
+        Case.prototype.CheckState = function (state) {
+            var complies = false;
+            for (var _i = 0, _a = this; _i < _a.length; _i++) {
+                var detail = _a[_i];
+                if (detail.CheckDetail(state)) {
+                    complies = true;
+                    break;
+                }
+            }
+            return complies;
+        };
         return Case;
     }(Array));
     ObservableState.Case = Case;
